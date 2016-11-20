@@ -1,20 +1,17 @@
 USE master
 GO
 
-CREATE PROCEDURE dbo.RestoreBackup @fullBackup bit, @dateTimeToRestore datetime, @dbNameToRestoreTo varchar(max)
+CREATE PROCEDURE dbo.RestoreBackup @fullBackup bit, @dateTimeToRestore datetime, @dbNameToRestoreTo varchar(max), @dbNameToRestoreFrom varchar(max)
 AS
 
 DECLARE @pathToBackup varchar(max)
-SET @pathToBackup = (SELECT Path from BackupInfoDB.dbo.BackupInfo where BackupDate = convert(varchar(25), CONVERT(VARCHAR(10),@dateTimeToRestore,10), 120))
-
-DECLARE @dbNameToRestoreFrom varchar(max)
-SET @dbNameToRestoreFrom = (SELECT dbName from BackupInfoDB.dbo.BackupInfo where BackupDate = convert(varchar(25), CONVERT(VARCHAR(10),@dateTimeToRestore,10), 120))
+SET @pathToBackup = (SELECT Path from BackupInfoDB.dbo.BackupInfo where BackupDate = convert(varchar(25), CONVERT(VARCHAR(10),@dateTimeToRestore,10), 120) AND dbName = @dbNameToRestoreFrom) 
 
 DECLARE @fullPath varchar(max)
 SET @fullPath = @pathToBackup+'\full_backupDB_'+convert(varchar(25), CONVERT(VARCHAR(10),@dateTimeToRestore,10), 120)+'.bak'
 
 DECLARE @differentialPath varchar(max)
-SET @differentialPath = @pathToBackup+'\differential_backupDB_'+convert(varchar(25),CONVERT(VARCHAR(10),@dateTimeToRestore,10), 120) +'.bak'
+SET @differentialPath = @pathToBackup+'\differential_backupDB_'+convert(varchar(25), CONVERT(VARCHAR(10),@dateTimeToRestore,10), 120) +'.bak'
 
 DECLARE @mdfNewPath varchar(max)
 DECLARE @ldfNewPath varchar(max)
